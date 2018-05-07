@@ -4,40 +4,86 @@
 
 using namespace std;
 
+//Define um conjunto que representa um vétice na LA.
 typedef struct no{
 	int valor;
 	struct no *prox;
 } No;
 
-No AlocaNo(int v){
-	No n;
+//Variáveis globais referente a Fila;
+int inicio , fim;
 
-	n.valor = v;
-	n.prox  = NULL;
+//Função responsável por alocar um nó na LA;
+No AlocaNo(int v1, int v2, No **v);
+
+//Aloca uma fila de nós para a busca em largura.
+int* AlocaFila(int tamanho);
+
+//Enfileira um nó.
+void Enfileirar(int v, int *fila);
+
+//Desenfileira um nó.
+int* Desenfileirar(int *fila);
+
+//Função principal.
+int main(){
+	int n, v1, v2;
+	No n1, n2;
+
+	scanf("%d", &n);
+
+	int* Dist = (int*) malloc(n * sizeof(int));
+	No** ListaAdja = (No**) malloc(n * sizeof(No*));
+
+	for (int i = 0; i < n; i++){
+		Dist[i] = -1;
+		ListaAdja[i] = NULL;
+	}
+
+	do{
+		scanf("%d %d", &v1, &v2);
+		AlocaNo(v1, v2, ListaAdja);
+
+	}while(getchar() != '\n');
+
+		
+
+	return 0;
+}
+
+//Definindo a função principal.
+No AlocaNo(int v1, int v2, No **v){
+	No n;
+	n.valor = v2;
+
+	if (v[v1 - 1] == NULL){
+		n.prox = NULL;
+		v[v1 - 1] = &n;
+
+	}else{
+		n.prox = v[v1 - 1];
+		v[v1 - 1] = &n;
+	}
 
 	return n;
 }
 
-int main(){
-	int n, v1, v2;
-	No n1, n2;
-	char x;
+//-----  Definições das funções da Fila -----
+int* AlocaFila(int tamanho){
 
-	scanf("%d", &n);
+	int *fila = (int *)malloc(tamanho * sizeof(int));
+	inicio = fim = 0;
 
-	No** v = (No**) malloc(n * sizeof(No*));
+	return fila;
+}
 
-	do{
-		scanf("%d %d", &v1, &v2);
+void Enfileirar(int v, int *fila){
+	fila[fim] = v;
+	fim += 1;
+}
 
-		n1 = AlocaNo(v1);
-		n2 = AlocaNo(v2);
+int Desenfileirar(int *fila){
+	inicio += 1;
 
-		v[v1 - 1] = &n1;
-		v[v2 - 1] = &n2;
-
-	}while(getchar() != '\n');
-		
-
-	return 0;
+	return fila[inicio-1];
 }
