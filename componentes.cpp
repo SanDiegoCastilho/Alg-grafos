@@ -25,6 +25,9 @@ void Enfileirar(int v, int *fila);
 //Desenfileira um nó.
 int* Desenfileirar(int *fila);
 
+//Verifica se a fila está vazia.
+bool FilaVazia();
+
 //Função principal.
 int main(){
 	int n, v1, v2;
@@ -40,13 +43,26 @@ int main(){
 		ListaAdja[i] = NULL;
 	}
 
+	//parte de receber o código.
 	do{
 		scanf("%d %d", &v1, &v2);
 		AlocaNo(v1, v2, ListaAdja);
 
 	}while(getchar() != '\n');
 
-		
+	int *F = AlocaFila(n);
+
+	for (int i = 0; i < n; i++){
+	 	Enfileirar(i, F);
+
+	 	while(!FilaVazia()){
+	 		int aux = Desenfileirar(F);
+	 		No *u 	= ListaAdja[aux];	 	}
+
+	 		while((*u).prox != NULL){
+	 			printf("lero\n" );
+	 		}
+	 } 
 
 	return 0;
 }
@@ -86,4 +102,12 @@ int Desenfileirar(int *fila){
 	inicio += 1;
 
 	return fila[inicio-1];
+}
+
+bool FilaVazia(){
+	if (inicio == fim){
+		return true;
+	}
+
+	return false;
 }
