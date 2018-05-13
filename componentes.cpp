@@ -5,10 +5,12 @@
 using namespace std;
 
 //Define um conjunto que representa um vétice na LA.
-typedef struct no{
+typedef struct no No;
+
+struct no{
 	int valor;
 	struct no *prox;
-} No;
+};
 
 //Variáveis globais referente a Fila;
 int inicio , fim, TamFila;
@@ -45,8 +47,7 @@ int main(){
 
 	int Dist[n];
 	bool Atingido[n];
-	// int* Dist = (int*) malloc(n * sizeof(int));
-	No** ListaAdja = (No**) malloc(n * sizeof(No*));
+	No* ListaAdja[n];
 
 	for (int i = 0; i < n; i++){
 		Dist[i] = -1;
@@ -61,11 +62,14 @@ int main(){
 
 	// }while(getchar() != '\n');
 
-	for (int i = 0; i < 3; i++){
+	for (int i = 0; i < n; i++){
 		scanf("%d %d", &v1, &v2);
-		AlocaNo(v1, v2, ListaAdja);
-		AlocaNo(v2, v1, ListaAdja);
+		AlocaNo((v1-1), (v2-1), ListaAdja);
+		AlocaNo((v2-1), (v1-1), ListaAdja);
+		No* v = ListaAdja[i];
+		printf("%d aaaqui \n", v->valor);
 	}
+
 
 	//Busca em largura.
 	int *F = AlocaFila(n);
@@ -78,7 +82,7 @@ int main(){
 
 		 	while(!FilaVazia()){
 		 		aux = Desenfileirar(F);
-		 		No *u = ListaAdja[aux];
+		 		No* u = ListaAdja[aux];
 
 		 		if (u == NULL){
 		 			Dist[aux] = comp;
@@ -86,15 +90,13 @@ int main(){
 		 		}
 
 		 		while(u != NULL){
-		 			if (Dist[(*u).valor - 1] == -1){
+		 			if (Dist[u->valor] == -1){
 
-		 				cout << comp;
+		 				Dist[u->valor] = comp;
+		 				Enfileirar(u->valor, F);
+		 				Atingido[u->valor] = true;
 
-		 				Dist[(*u).valor - 1] = comp;
-		 				Enfileirar((*u).valor - 1, F);
-		 				Atingido[(*u).valor - 1] = true;
-
-		 				u = (*u).prox;
+		 				u = u->prox;
 		 			}
 		 		}
 		 	}
@@ -109,17 +111,17 @@ int main(){
 }
 
 //Definindo a função principal.
-void AlocaNo(int v1, int v2, No **v){
+void AlocaNo(int v1, int v2, No **ListaAdja){
 	No n;
 	n.valor = v2;
 
-	if (v[v1 - 1] == NULL){
+	if (ListaAdja[v1] == NULL){
 		n.prox = NULL;
-		v[v1 - 1] = &n;
+		ListaAdja[v1] = &n;
 
 	}else{
-		n.prox = v[v1 - 1];
-		v[v1 - 1] = &n;
+		n.prox = ListaAdja[v1];
+		ListaAdja[v1] = &n;
 	}
 }
 
@@ -133,16 +135,8 @@ int* AlocaFila(int tamanho){
 }
 
 void Enfileirar(int v, int *fila){
-	if (fim != TamFila - 1){
-		fila[fim] = v;
-		fim += 1;
-	}else{
-		if (inicio == 0 && fim == TamFila - 1){
-			printf("fila cheia\n");
-		}else{
-			fim = 0;
-		}
-	}
+	fila[fim] = v;
+	fim += 1;
 }
 
 int Desenfileirar(int *fila){
