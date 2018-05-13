@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <string>
 #include <stdio.h>
 
 using namespace std;
@@ -190,14 +191,16 @@ bool FilaVazia(){
 //Mostrando os componentes na tela.
 void MostraComponentes(int* componentes, int n){
 	int i = 0;
-
-	while(i < comp){
-		for (int j = 0; j < n; j++){
-			if (componentes[j] == i){
-				printf("%d ", (j+1));
-			}
-		}
-		printf("\n");
-		i += 1;
-	}
+        while (i < comp) {
+                string out = "";
+                for (int j = 0; j < n; j++) {
+                        if (componentes[j] == i) {
+                                out += to_string(j+1);
+                                out += " ";
+                        }
+                }
+                out = out.substr(0, out.size() - 1);
+                cout << out << endl;
+                i += 1;
+        }
 }
