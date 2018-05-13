@@ -1,6 +1,5 @@
 #include <iostream>
 #include <cstdlib>
-#include <string>
 #include <stdio.h>
 
 using namespace std;
@@ -85,8 +84,6 @@ int main(){
 		IncluirNo(ListaAdja, AlocaNo((v2-1)), (v1-1));
 		IncluirNo(ListaAdja, AlocaNo((v1-1)), (v2-1));
 
-
-		printf("%d %d\n",v1, v2);
 		v1 = 0;
 		v2 = 0;
 	}
@@ -191,6 +188,7 @@ bool FilaVazia(){
 //Mostrando os componentes na tela.
 void MostraComponentes(int* componentes, int n){
 	int i = 0;
+
         while (i < comp) {
                 string out = "";
                 for (int j = 0; j < n; j++) {
@@ -202,5 +200,5 @@ void MostraComponentes(int* componentes, int n){
                 out = out.substr(0, out.size() - 1);
                 cout << out << endl;
                 i += 1;
-        }
+	}
 }
