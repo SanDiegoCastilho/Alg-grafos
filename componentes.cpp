@@ -109,10 +109,6 @@ int main(){
 	 	comp += 1;	
 	 }
 
-	 for (int i = 0; i < n; ++i){
-	 	cout << "componentes: " << Dist[i] << " posição: " << i << endl;
-	 }
-
 	 MostraComponentes(Dist, n);
 
 	return 0;
@@ -177,13 +173,13 @@ bool FilaVazia(){
 void MostraComponentes(int* componentes, int n){
 	int i = 0;
 
-	while(i < comp){
+	while(i < n){
 		for (int j = 0; j < n; j++){
 			if (componentes[j] == i){
 				printf("%d ", (j+1));
 			}
 		}
-		printf("\n", i);
+		printf("\n");
 		i += 1;
 	}
 }
