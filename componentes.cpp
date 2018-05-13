@@ -9,7 +9,7 @@ typedef struct no No;
 
 struct no{
 	int valor;
-	struct no *prox;
+	No* prox;
 };
 
 //Variáveis globais referente a Fila;
@@ -19,7 +19,13 @@ int inicio , fim, TamFila;
 int comp = 0;
 
 //Função responsável por alocar um nó na LA;
-void AlocaNo(int v1, int v2, No **v);
+No* AlocaNo(int valor);
+
+//Adiciona um nó alocado na lista de adjacencias na posição correspondente.
+void IncluirNo(No** ListaAdja, No* no, int indice);
+
+//Recupera o valor de um nó na posição indicada.
+No* RecuperaNo(int i, No** ListaAdja);
 
 //Aloca uma fila de nós para a busca em largura.
 int* AlocaFila(int tamanho);
@@ -43,11 +49,9 @@ int main(){
 
 	scanf("%d", &n);
 
-	TamFila = n;
-
-	int Dist[n];
-	bool Atingido[n];
-	No* ListaAdja[n];
+	int *Dist = (int*) malloc(n * sizeof(int));
+	No** ListaAdja = (No**) malloc(n * sizeof(No*));
+	bool *Atingido = (bool*) malloc(n * sizeof(bool));
 
 	for (int i = 0; i < n; i++){
 		Dist[i] = -1;
@@ -62,14 +66,11 @@ int main(){
 
 	// }while(getchar() != '\n');
 
-	for (int i = 0; i < n; i++){
+	for (int i = 0; i < 3; i++){
 		scanf("%d %d", &v1, &v2);
-		AlocaNo((v1-1), (v2-1), ListaAdja);
-		AlocaNo((v2-1), (v1-1), ListaAdja);
-		No* v = ListaAdja[i];
-		printf("%d aaaqui \n", v->valor);
+		IncluirNo(ListaAdja, AlocaNo((v2-1)), (v1-1));
+		IncluirNo(ListaAdja, AlocaNo((v1-1)), (v2-1));
 	}
-
 
 	//Busca em largura.
 	int *F = AlocaFila(n);
@@ -79,10 +80,12 @@ int main(){
 		if (!Atingido[i]){
 			
 		 	Enfileirar(i, F);
+		 	Atingido[i] = true;
+		 	Dist[i] = comp;
 
 		 	while(!FilaVazia()){
 		 		aux = Desenfileirar(F);
-		 		No* u = ListaAdja[aux];
+		 		No* u = RecuperaNo(aux, ListaAdja);
 
 		 		if (u == NULL){
 		 			Dist[aux] = comp;
@@ -90,19 +93,24 @@ int main(){
 		 		}
 
 		 		while(u != NULL){
-		 			if (Dist[u->valor] == -1){
+		 			if (!Atingido[u->valor]){
 
-		 				Dist[u->valor] = comp;
 		 				Enfileirar(u->valor, F);
 		 				Atingido[u->valor] = true;
+		 				Dist[u->valor] = comp;
 
-		 				u = u->prox;
 		 			}
+
+		 			u = u->prox;
 		 		}
 		 	}
 		}
 
 	 	comp += 1;	
+	 }
+
+	 for (int i = 0; i < n; ++i){
+	 	cout << "componentes: " << Dist[i] << " posição: " << i << endl;
 	 }
 
 	 MostraComponentes(Dist, n);
@@ -111,18 +119,30 @@ int main(){
 }
 
 //Definindo a função principal.
-void AlocaNo(int v1, int v2, No **ListaAdja){
-	No n;
-	n.valor = v2;
+No* AlocaNo(int valor){
+	No *n;
 
-	if (ListaAdja[v1] == NULL){
-		n.prox = NULL;
-		ListaAdja[v1] = &n;
+	n = (No*) malloc(sizeof(No));
 
-	}else{
-		n.prox = ListaAdja[v1];
-		ListaAdja[v1] = &n;
+	n->valor = valor;
+
+	n->prox = NULL;
+}
+
+void IncluirNo(No** ListaAdja, No* no, int indice){
+	if (ListaAdja != NULL && no != NULL){
+		if (ListaAdja[indice] == NULL){
+			ListaAdja[indice] = no;
+
+		}else{
+			no->prox = ListaAdja[indice];
+			ListaAdja[indice] = no;
+		}
 	}
+}
+
+No* RecuperaNo(int i, No** ListaAdja){
+	return ListaAdja[i]; 
 }
 
 //-----  Definições das funções da Fila -----
@@ -154,14 +174,16 @@ bool FilaVazia(){
 }
 
 //Mostrando os componentes na tela.
-void MostraComponentes(int* v, int n){
-	for (int i = 0; i < n; i++){
-		for (int j = 0; i < n; i++){
-			if (v[j] == i){
-				printf("%d ", i+1);
-			}
+void MostraComponentes(int* componentes, int n){
+	int i = 0;
 
-			cout << endl;
+	while(i < comp){
+		for (int j = 0; j < n; j++){
+			if (componentes[j] == i){
+				printf("%d ", (j+1));
+			}
 		}
+		printf("\n", i);
+		i += 1;
 	}
 }
