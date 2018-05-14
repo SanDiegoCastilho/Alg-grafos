@@ -50,7 +50,6 @@ int main(){
 
 
 	//parte de receber o código.
-<<<<<<< HEAD
 	char leitura[40];
 	int cont = 0;
 	do {
@@ -68,17 +67,6 @@ int main(){
 		convert = 10;
 	}
 
-=======
-
-	while(getchar() != 'n'){}
-	getchar();
-	while((c = getchar()) != '\n'){
-		n = (n * 10) + (c - 48);
-	}
-
-	while(getchar() != ':'){}
-
->>>>>>> 3c8fa46abf120b9c63b7eeb8b389ba1148e69685
 
 	int *Dist = (int*) malloc(n * sizeof(int));
 	No** ListaAdja = (No**) malloc(n * sizeof(No*));
@@ -89,7 +77,6 @@ int main(){
 		Atingido[i] = false;
 		ListaAdja[i] = NULL;
 	}
-<<<<<<< HEAD
 	char lixo;
 	int n_argumentos;
 	scanf("%s", &lixo);
@@ -106,26 +93,6 @@ int main(){
 	} while (n_argumentos == 2);
 
 
-=======
-
-	getchar();
-
-	for ((entrada = getchar()); entrada != EOF; (entrada = getchar())){
-		do{
-			v1 = ((v1 * 10) + (entrada - 48));
-		}while(entrada = getchar() != ' ');
-
-		while((entrada = getchar()) != '\n'){
-			v2 = ((v2 * 10) + (entrada - 48));
-		}
-
-		IncluirNo(ListaAdja, AlocaNo((v2-1)), (v1-1));
-		IncluirNo(ListaAdja, AlocaNo((v1-1)), (v2-1));
-
-		v1 = 0;
-		v2 = 0;
-	}
->>>>>>> 3c8fa46abf120b9c63b7eeb8b389ba1148e69685
 
 	//Busca em largura.
 	int *F = AlocaFila(n);
@@ -227,10 +194,7 @@ bool FilaVazia(){
 //Mostrando os componentes na tela.
 void MostraComponentes(int* componentes, int n){
 	int i = 0;
-<<<<<<< HEAD
 	// printf("\n");
-=======
->>>>>>> 3c8fa46abf120b9c63b7eeb8b389ba1148e69685
 
         while (i < comp) {
                 string out = "";
