@@ -67,7 +67,6 @@ int main(){
 		convert = 10;
 	}
 
-
 	int *Dist = (int*) malloc(n * sizeof(int));
 	No** ListaAdja = (No**) malloc(n * sizeof(No*));
 	bool *Atingido = (bool*) malloc(n * sizeof(bool));
@@ -77,6 +76,7 @@ int main(){
 		Atingido[i] = false;
 		ListaAdja[i] = NULL;
 	}
+
 	char lixo;
 	int n_argumentos;
 	scanf("%s", &lixo);
@@ -91,8 +91,6 @@ int main(){
 		else n_argumentos = 0;
 
 	} while (n_argumentos == 2);
-
-
 
 	//Busca em largura.
 	int *F = AlocaFila(n);
@@ -195,7 +193,6 @@ bool FilaVazia(){
 void MostraComponentes(int* componentes, int n){
 	int i = 0;
 	// printf("\n");
-
         while (i < comp) {
                 string out = "";
                 for (int j = 0; j < n; j++) {

@@ -1,12 +1,8 @@
-import os
-import commands
+from subprocess import Popen, PIPE
 
 for i in range(120):
-	print("--------Teste " + i + "--------")
-	with open("../tarefa_1_solucoes/" + i + "_solucao.txt", "r") as file:
-		stat, output = commands.getstatusoutput("cat {}_grafo.dl | ./teste.bin".format(i))
+	print("--------Teste %d--------" % i)
+	with open("../tarefa_1_solucoes/%d_solucao.txt" % i, "r") as file:
+		output = Popen(['./teste.bin < %d_grafo.dl' % i], stdout=PIPE, shell=True).communicate()[0].decode("utf-8")
+		print(output == file.read())
 
-		if stat == 0:
-			assert output == file.read().replace('\n', '')
-		else:
-			print("Command failed, here is the output")
