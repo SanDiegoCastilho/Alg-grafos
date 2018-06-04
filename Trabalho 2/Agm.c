@@ -88,11 +88,13 @@ int main(){
 
             soma += w->peso;
 
-            w = g->LA[w->valor];
-            while(w != NULL){
-                  if (!atingido[w->valor]){
-                        atingido[w->valor] = 1;
-                        // pai[w->valor] = w->valor;
+            No* z = (No*)malloc(sizeof(No));
+            z = g->LA[w->valor];
+            
+            while(z != NULL){
+                  if (!atingido[z->valor]){
+                        atingido[z->valor] = 1;
+                        pai[z->valor] = w->valor;
 
                   }else{
                         if(Pertence(z, h) && ){
