@@ -44,6 +44,8 @@ No* ExtrairMin(Heap* h);
 
 void AmontoarMin(Heap* v, int i);
 
+int Pertence(Heap h*, No* u)
+
 int Pai(int i);
 
 int FEsquerdo(int i);
@@ -90,23 +92,19 @@ int main(){
 
             No* z = (No*)malloc(sizeof(No));
             z = g->LA[w->valor];
-            
+
             while(z != NULL){
                   if (!atingido[z->valor]){
                         atingido[z->valor] = 1;
                         pai[z->valor] = w->valor;
 
                   }else{
-                        if(Pertence(z, h) && ){
+                        if(Pertence(h, z) && z->peso < ){
 
                         }
                   }
             }
       }
-
-
-
-     
 
       return 0;
 }
@@ -181,6 +179,18 @@ void AmontoarMin(Heap* h, int i){
       if (menor != i){
             Trocar(h, i, menor);
             AmontoarMin(h, menor);
+      }
+}
+
+int Pertence(Heap h*, No* u){
+      if (h != NULL && u != NULL){
+            for (int i = 0; i <= h->Htamanho; i++){
+                  if(h->val[i]->valor == u->valor){
+                        return 1;
+                  }else{
+                        return 0;
+                  }
+            }
       }
 }
 
