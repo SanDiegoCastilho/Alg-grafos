@@ -27,10 +27,6 @@ GrafoLA* AlocaGrafoLA(int t);
 
 void IncluirNo(GrafoLA* g, No* no, int indice);
 
- // double RetornaPeso(double** pesos, int i, int j);
-
-// void AdicionarPeso(double** pesos, int i, int j, double p);
-
 //Assinaturas das funções da HEAP.
 Heap* ConstruirHeap(int n);
 
@@ -44,7 +40,7 @@ No* ExtrairMin(Heap* h);
 
 void AmontoarMin(Heap* v, int i);
 
-int Pertence(Heap h*, No* u)
+int Pertinencia(Heap *h, No* u);
 
 int Pai(int i);
 
@@ -54,24 +50,65 @@ int FDireito(int i);
 
 int HeapVazia(Heap* h);
 
+int ChecaExistencia(Heap *h, int indice);
+
 
 int main(){
       int n = 0, v1 = 0, v2 = 0;
       double p = 0, soma = 0;
 
+      // char c;
+      // int entrada = 0;
+
+      // //parte de receber o código.
+      // char leitura[40];
+      // int cont = 0;
+      // do {
+      //       scanf("%s", &leitura);
+      //       printf("passo 0\n");
+      //       cont ++;
+      // } while (cont != 3);
+
+      // int convert = 1;
+      // int lei;
+      // for (int i = 2; leitura[i] != '\0'; i++) {
+      //       n *= convert;
+      //       lei = leitura[i]-48;
+      //       n += lei;
+      //       convert = 10;
+      // }
       scanf("%d", &n);
+      printf("passo 1\n");
       int* pai = (int*)malloc(sizeof(int) * n);
       int* atingido = (int*)malloc(sizeof(int) * n);
       GrafoLA* g = AlocaGrafoLA(n);
       Heap *h = ConstruirHeap(n);
+
+      // char lixo;
+      // int n_argumentos;
+      // scanf("%s", &lixo);
+      // do {
+      //       n_argumentos = scanf("%d %d %lg", &v1, &v2, &p);
+      //       if (n_argumentos == 3 && 0 < v1 <= n && 0 < v2 <= n && v1 != v2) {
+
+            for (int i = 0; i < 24; i++){
+                  scanf("%d %d %lg", &v1, &v2, &p);
+                  IncluirNo(g, AlocaNo((v2-1), p), (v1-1));
+                  IncluirNo(g, AlocaNo((v1-1), p), (v2-1));
+            }
+
+      //       } else
+      //             n_argumentos = 0;
+
+      // } while (n_argumentos == 3);
+
 
       for (int i = 0; i < n; i++){
             pai[i] = -1;
             atingido[i] = 0;
       }
 
-      IncluirNo(g, AlocaNo((v2-1), p), (v1-1));
-      IncluirNo(g, AlocaNo((v1-1), p), (v2-1));
+     
 
       /*Rever esse algoritmo*/
       No* u = g->LA[0];
@@ -99,12 +136,16 @@ int main(){
                         pai[z->valor] = w->valor;
 
                   }else{
-                        if(Pertence(h, z) && z->peso < ){
-
+                        int t = Pertinencia(h, z);
+                        if(t){
+                              DiminuirChave(h, t, z);
+                              pai[z->valor] = w->valor; 
                         }
                   }
             }
       }
+
+      printf("%g", soma);
 
       return 0;
 }
@@ -123,16 +164,22 @@ Heap* ConstruirHeap(int n){
 }
 
 void InserirChave(Heap* h, No* v){
-      h->Htamanho = (h->Htamanho + 1);
-      h->val[h->Htamanho] = NULL;
-      DiminuirChave(h, h->Htamanho, v);
+      if (h != NULL && v != NULL){
+            h->Htamanho = (h->Htamanho + 1);
+            h->val[h->Htamanho] = NULL;
+            DiminuirChave(h, h->Htamanho, v);
+      }
 }
 
 void DiminuirChave(Heap *h, int i, No* v){
-      h->val[i] = v;
-      while(i >= 1 && h->val[Pai(i)]->peso > h->val[i]->peso){
-            Trocar(h, i, Pai(i));
-            i = Pai(i);
+      if (h != NULL && v != NULL){
+            if (h->val[i] != NULL){
+                  h->val[i]->peso = v->peso;
+                  while(i >= 1 && h->val[Pai(i)]->peso > h->val[i]->peso){
+                        Trocar(h, i, Pai(i));
+                        i = Pai(i);
+                  }
+            }
       }
 }
 
@@ -164,29 +211,36 @@ void AmontoarMin(Heap* h, int i){
       int d = FDireito(i);
       int menor = 0;
 
-      if ((e <= h->Htamanho) && (h->val[e]->peso < h->val[i]->peso)){
-            menor = e;
+      if (h !== NULL){
+            
+            if ((e <= h->Htamanho) && (h->val[e]->peso < h->val[i]->peso)){
+                  menor = e;
 
-      }else{
-            menor = i;
+            }else{
+                  menor = i;
 
+            }
+
+            if ((d <= h->Htamanho) && (h->val[d]->peso < h->val[i]->peso)){
+                  menor = d;
+            }
+
+            if (menor != i){
+                  Trocar(h, i, menor);
+                  AmontoarMin(h, menor);
+            }
       }
 
-      if ((d <= h->Htamanho) && (h->val[d]->peso < h->val[i]->peso)){
-            menor = d;
-      }
-
-      if (menor != i){
-            Trocar(h, i, menor);
-            AmontoarMin(h, menor);
-      }
 }
 
-int Pertence(Heap h*, No* u){
+int Pertinencia(Heap *h, No* u){
       if (h != NULL && u != NULL){
             for (int i = 0; i <= h->Htamanho; i++){
                   if(h->val[i]->valor == u->valor){
-                        return 1;
+                        if (h->val[i]->peso > u->peso){
+                              return i;
+                        }
+
                   }else{
                         return 0;
                   }
@@ -250,10 +304,10 @@ void IncluirNo(GrafoLA* g, No* no, int indice){
       }
 }
 
-// double RetornaPeso(double** pesos, int i, int j){
-//       return pesos[i][j];
-// }
+int ChecaExistencia(Heap *h, int indice){
+      if (h->val[indice] != NULL){
+           return 1;
+      }
 
-// void AdicionarPeso(double** pesos, int i, int j, double p){
-//       pesos[i][j] = p;
-// }
+      return 0;
+}
