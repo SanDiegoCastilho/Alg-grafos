@@ -173,7 +173,7 @@ void InserirChave(Heap* h, No* v){
 
 void DiminuirChave(Heap *h, int i, No* v){
       if (h != NULL && v != NULL){
-            if (h->val[i] != NULL){
+            if (ChecaExistencia(i)){
                   h->val[i]->peso = v->peso;
                   while(i >= 1 && h->val[Pai(i)]->peso > h->val[i]->peso){
                         Trocar(h, i, Pai(i));
@@ -185,10 +185,11 @@ void DiminuirChave(Heap *h, int i, No* v){
 
 void Trocar(Heap* h, int i, int j){
       No* aux = (No*)malloc(sizeof(No));
-
-      aux = h->val[i];
-      h->val[i] = h->val[j];
-      h->val[j] = aux;
+      if (ChecaExistencia(i)){
+            aux = h->val[i];
+            h->val[i] = h->val[j];
+            h->val[j] = aux;
+      }
 }
 
 No* ExtrairMin(Heap* h){
@@ -211,7 +212,7 @@ void AmontoarMin(Heap* h, int i){
       int d = FDireito(i);
       int menor = 0;
 
-      if (h !== NULL){
+      if (h !== NULL && ChecaExistencia(e) && ChecaExistencia(d) && ChecaExistencia(i)){
             
             if ((e <= h->Htamanho) && (h->val[e]->peso < h->val[i]->peso)){
                   menor = e;
