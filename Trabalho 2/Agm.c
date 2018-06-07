@@ -52,6 +52,9 @@ int HeapVazia(Heap* h);
 
 int ChecaExistencia(Heap *h, int indice);
 
+void MostrarHeap(Heap *h);
+
+
 
 int main(){
       int n = 0, v1 = 0, v2 = 0;
@@ -78,7 +81,7 @@ int main(){
       //       convert = 10;
       // }
       scanf("%d", &n);
-      printf("passo 1\n");
+      // printf("passo 1\n");
       int* pai = (int*)malloc(sizeof(int) * n);
       int* atingido = (int*)malloc(sizeof(int) * n);
       GrafoLA* g = AlocaGrafoLA(n);
@@ -91,7 +94,7 @@ int main(){
       //       n_argumentos = scanf("%d %d %lg", &v1, &v2, &p);
       //       if (n_argumentos == 3 && 0 < v1 <= n && 0 < v2 <= n && v1 != v2) {
 
-            for (int i = 0; i < 24; i++){
+            for (int i = 0; i < 5; i++){
                   scanf("%d %d %lg", &v1, &v2, &p);
                   IncluirNo(g, AlocaNo((v2-1), p), (v1-1));
                   IncluirNo(g, AlocaNo((v1-1), p), (v2-1));
@@ -121,14 +124,21 @@ int main(){
             u = u->prox;
       }
 
+      MostrarHeap(h);
+
+      // printf("passo 2\n");
       while(!HeapVazia(h)){
             No* w = (No*)malloc(sizeof(No));
             w = ExtrairMin(h);
 
-            soma += w->peso;
+            if (w != NULL){
+                  soma += w->peso;
+            }
 
             No* z = (No*)malloc(sizeof(No));
-            z = g->LA[w->valor];
+            if (ChecaExistencia(h, w->valor)){
+                  z = g->LA[w->valor];
+            }
 
             while(z != NULL){
                   if (!atingido[z->valor]){
@@ -156,6 +166,8 @@ Heap* ConstruirHeap(int n){
       h->comprimento = n;
       h->Htamanho = -1;
 
+      // printf("Construir Heap\n");
+
       for (int i = 0; i < n; i++){
             h->val[i] = NULL;
       }
@@ -163,17 +175,25 @@ Heap* ConstruirHeap(int n){
       return h;
 }
 
+/*Na posição Htamanho da HEAP estava colocando NULL, PQ? Talvez seja o principal motivo de erros.*/
 void InserirChave(Heap* h, No* v){
       if (h != NULL && v != NULL){
+
+            // printf("Inserir Chave\n");
+            // printf("Tamanho: %d\n", h->Htamanho);
+
             h->Htamanho = (h->Htamanho + 1);
-            h->val[h->Htamanho] = NULL;
+            h->val[h->Htamanho] = v;
             DiminuirChave(h, h->Htamanho, v);
       }
 }
 
 void DiminuirChave(Heap *h, int i, No* v){
       if (h != NULL && v != NULL){
-            if (ChecaExistencia(i)){
+            if (ChecaExistencia(h,i)){
+
+                  // printf("Diminuir Chave\n");
+
                   h->val[i]->peso = v->peso;
                   while(i >= 1 && h->val[Pai(i)]->peso > h->val[i]->peso){
                         Trocar(h, i, Pai(i));
@@ -185,7 +205,7 @@ void DiminuirChave(Heap *h, int i, No* v){
 
 void Trocar(Heap* h, int i, int j){
       No* aux = (No*)malloc(sizeof(No));
-      if (ChecaExistencia(i)){
+      if (ChecaExistencia(h,i)){
             aux = h->val[i];
             h->val[i] = h->val[j];
             h->val[j] = aux;
@@ -193,18 +213,17 @@ void Trocar(Heap* h, int i, int j){
 }
 
 No* ExtrairMin(Heap* h){
-      if (h->Htamanho < 0){
-            printf("Heap Underflow\n");
+      if (h != NULL){
+            if (ChecaExistencia(h,0)){
+                  No* min = (No*)malloc(sizeof(No));
+                  min = h->val[0];
+                  h->val[0] = h->val[h->Htamanho];
+                  h->Htamanho = (h->Htamanho - 1); 
+                  AmontoarMin(h, 0);
+
+                  return min;
+            }
       }
-
-      No* min = (No*)malloc(sizeof(No));
-      min = h->val[0];
-      h->val[0] = h->val[h->Htamanho];
-      h->Htamanho = (h->Htamanho - 1); 
-
-      AmontoarMin(h, 0);
-
-      return min;
 }
 
 void AmontoarMin(Heap* h, int i){
@@ -212,30 +231,32 @@ void AmontoarMin(Heap* h, int i){
       int d = FDireito(i);
       int menor = 0;
 
-      if (h !== NULL && ChecaExistencia(e) && ChecaExistencia(d) && ChecaExistencia(i)){
-            
-            if ((e <= h->Htamanho) && (h->val[e]->peso < h->val[i]->peso)){
-                  menor = e;
+      if (h != NULL){
+            if (ChecaExistencia(h,e) && ChecaExistencia(h,d) && ChecaExistencia(h,i)){
+                  
+                  if ((e <= h->Htamanho) && (h->val[e]->peso < h->val[i]->peso)){
+                        menor = e;
 
-            }else{
-                  menor = i;
+                  }else{
+                        menor = i;
 
-            }
+                  }
 
-            if ((d <= h->Htamanho) && (h->val[d]->peso < h->val[i]->peso)){
-                  menor = d;
-            }
+                  if ((d <= h->Htamanho) && (h->val[d]->peso < h->val[i]->peso)){
+                        menor = d;
+                  }
 
-            if (menor != i){
-                  Trocar(h, i, menor);
-                  AmontoarMin(h, menor);
+                  if (menor != i){
+                        Trocar(h, i, menor);
+                        AmontoarMin(h, menor);
+                  }
             }
       }
 
 }
 
 int Pertinencia(Heap *h, No* u){
-      if (h != NULL && u != NULL){
+      if (h != NULL && u != NULL ){
             for (int i = 0; i <= h->Htamanho; i++){
                   if(h->val[i]->valor == u->valor){
                         if (h->val[i]->peso > u->peso){
@@ -306,9 +327,18 @@ void IncluirNo(GrafoLA* g, No* no, int indice){
 }
 
 int ChecaExistencia(Heap *h, int indice){
+      // printf("Checa Existencia\n");
       if (h->val[indice] != NULL){
            return 1;
       }
 
       return 0;
+}
+
+void MostrarHeap(Heap *h){
+      for (int i = 0; i < h->Htamanho; i++){
+            if (h->val[i] != NULL){
+                  printf("%lg, %d\n ", h->val[i]->peso, i);
+            }
+      }
 }
