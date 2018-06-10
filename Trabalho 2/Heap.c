@@ -2,165 +2,234 @@
 #include <float.h>
 #include <stdlib.h>
 
+typedef struct no{
+      struct no* prox;
+      double peso;
+      int valor;
+} No;
+
 typedef struct heap{
-	double *val;
-
+	No** valores;
 	int comprimento;
-
 	int tamanho;
 } Heap;
 
+
 //Assinaturas das funções da HEAP.
+//Retorna a posição do Pai de um dado elemento.
 int Pai(int i);
 
+//Retorna a posição do Filho esquerdo de um dado elemento. 
 int FEsquerdo(int i);
 
+//Retorna a posição do Filho direito de um dado elemento.
 int FDireito(int i);
 
+//Extrai o peso mínimo armazenado na HEAP.
 double ExtrairMin(Heap* h);
 
-void AmontoarMin(Heap* v, int i);
+//Função responsável por manter a propriedade de HEAP.
+void Descer(Heap* v, int i);
 
+//Função auxiliar responsável por trocar dois Nós na HEAP.
 void Trocar(Heap* h, int i, int j);
 
-void DiminuirChave(Heap *h, int i, double v);
+//Função responsável por Diminuir a Chave de um determinado Nó na HEAP.
+void DiminuirChave(Heap *h, int i, double chave);
 
-void InserirChave(Heap* h, double v);
+//Insere um Nó na HEAP.
+void InserirChave(Heap* h, No* u);
 
+//Inicializa A HEAP.
 Heap* ConstruirHeap(int n);
 
+//Verifica se a HEAP está vazia.
 int HeapVazia(Heap* h);
 
 
 
-int main(){
+No* AlocaNo(int v, double p);
 
+
+int main(){
+	int v1 = 0, v2 = 0;
+	double p = 0;
 	Heap* h = ConstruirHeap(10);
 
-	for (int i = 0; i < h->comprimento; i++){
-		printf("valor : %g\n", h->val[i]);
+	for (int i = 0; i < 5; i++){
+    	scanf("%d %d %lg", &v1, &v2, &p);
+    	InserirChave(h, AlocaNo((v2 - 1), p));
 	}
 
-	InserirChave(h, 300.45);
-	InserirChave(h, 290.15);
-	InserirChave(h, 30.95);
-	InserirChave(h, 3083.95);
-	InserirChave(h, 20.95);
-	InserirChave(h, 2150.95);
 
-	printf("\n");
-	for (int i = 0; i < h->comprimento; i++){
-		printf("valor : %g\n", h->val[i]);
-	}
-
-	printf("\n");
-	printf("valor minimo: %g\n", ExtrairMin(h));
-
-	printf("\n");
 	for (int i = 0; i <= h->tamanho; i++){
-		printf("valor: %g\n", h->val[i]);
+		printf("H[%d] = > peso: %lg No: %d\n",i, h->valores[i]->peso, h->valores[i]->valor);
 	}
+
+	double min = 0;
+
+	for (int i = 0; i < 5; i++){
+		min = ExtrairMin(h);
+
+		printf("min: %lg\n", min);
+
+		for (int i = 0; i <= h->tamanho; i++){
+			printf("H[%d] = > peso: %lg No: %d\n",i, h->valores[i]->peso, h->valores[i]->valor);
+		}
+	}
+
+	// InserirChave(h, 300.45);
+	// InserirChave(h, 290.15);
+	// InserirChave(h, 30.95);
+	// InserirChave(h, 3083.95);
+	// InserirChave(h, 20.95);
+	// InserirChave(h, 2150.95);
+
+	// printf("\n");
+	// for (int i = 0; i < h->comprimento; i++){
+	// 	printf("valor : %g\n", h->val[i]);
+	// }
+
+	// printf("\n");
+	// printf("valor minimo: %g\n", ExtrairMin(h));
+
+	// printf("\n");
+	// for (int i = 0; i <= h->tamanho; i++){
+	// 	printf("valor: %g\n", h->val[i]);
+	// }
 
 	return 0;
 }
 
 
-
+//Definição das funções de manipulação de HEAP.
 int Pai(int i){
+	if (i != 0 && i % 2 == 0)
+		return (i >> 1) - 1;
+
 	return (i >> 1);
 }
 
 int FEsquerdo(int i){
-	return (2 * i);
-}
-
-int FDireito(int i){
 	return (2 * i) + 1;
 }
 
+int FDireito(int i){
+	return (2 * i) + 2;
+}
+
+//Extrai o peso mínimo armazenado na HEAP.
 double ExtrairMin(Heap* h){
-	if (h->tamanho < 1){
-		printf("Heap Underflow\n");
+	if (h != NULL && h->tamanho >= 0){
+		double min = h->valores[0]->peso;
+		h->valores[0] = h->valores[h->tamanho];
+		h->tamanho = (h->tamanho - 1); 
+		Descer(h, 0);
+
+		return min;
 	}
 
-	printf("valor de val[tamanho]: %g\n", h->val[h->tamanho]);
-	double min = h->val[0];
-	h->val[0] = h->val[h->tamanho];
-	h->tamanho = (h->tamanho - 1); 
-
-	AmontoarMin(h, 0);
-
-	return min;
+	return 0;
 }
 
-void AmontoarMin(Heap* h, int i){
-	int e = FEsquerdo(i);
-	int d = FDireito(i);
-	int menor = 0;
+//Função responsável por manter a propriedade de HEAP.
+void Descer(Heap* h, int i){
+	if (h != NULL && i >= 0 && i <= h->tamanho){
+		int e = FEsquerdo(i);
+		int d = FDireito(i);
+		int menor = 0;
 
-	if ((e <= h->tamanho) && (h->val[e] < h->val[i])){
+		if ((e <= h->tamanho) && (h->valores[e]->peso < h->valores[i]->peso))
+			menor = e;
+		else
+			menor = i;
+		
 
-		menor = e;
+		if ((d <= h->tamanho) && (h->valores[d]->peso < h->valores[menor]->peso))
+			menor = d;
+		
 
-	}else{
-		menor = i;
-	}
-
-	if ((d <= h->tamanho) && (h->val[d] < h->val[i])){
-		menor = d;
-	}
-
-	if (menor != i){
-		Trocar(h, i, menor);
-		AmontoarMin(h, menor);
+		if (menor != i){
+			Trocar(h, i, menor);
+			Descer(h, menor);
+		}
 	}
 }
 
+//Função auxiliar responsável por trocar dois Nós na HEAP.
 void Trocar(Heap* h, int i, int j){
-	double aux;
+	if (h != NULL){
+		No* aux = (No*)malloc(sizeof(No));
 
-	aux = h->val[i];
+		aux = h->valores[j];
+		h->valores[j] = h->valores[i];
+		h->valores[i] = aux;
 
-	h->val[i] = h->val[j];
-
-	h->val[j] = aux;
-}
-
-void DiminuirChave(Heap *h, int i, double v){
-	if (v > h->val[i]){
-		printf("Valor é maior que a chave\n");
-	}
-
-	h->val[i] = v;
-	while(i >= 1 && h->val[Pai(i)] > h->val[i]){
-		Trocar(h, i, Pai(i));
-		i = Pai(i);
 	}
 }
 
-void InserirChave(Heap* h, double v){
-	h->tamanho = (h->tamanho + 1);
-	h->val[h->tamanho] = DBL_MAX;
-	DiminuirChave(h, h->tamanho, v);
+//Função responsável por Diminuir a Chave de um determinado Nó na HEAP.
+void DiminuirChave(Heap *h, int i, double chave){
+	if (h != NULL && chave < h->valores[i]->peso){
+		h->valores[i]->peso = chave;
+
+		// if (chave == -96.8){
+		// 	printf("pai: %d\n", Pai(i));
+		// 	printf("peso do pai: %lg\n", h->valores[Pai(i)]->peso);
+		// }
+
+		if (i % 2 == 0){
+			printf("Pai (%d): %d\n",i, Pai(i));
+		}
+		while(i > 0 && h->valores[Pai(i)]->peso > h->valores[i]->peso){
+			printf("chave: %lg\n", chave);
+			Trocar(h, i, Pai(i));
+			i = Pai(i);
+		}
+	}
 }
 
+//Insere um Nó na HEAP.
+void InserirChave(Heap* h, No* u){
+	if (h != NULL && u != NULL){
+		double peso = u->peso;
+		h->tamanho = (h->tamanho + 1);
+		h->valores[h->tamanho] = u;
+		h->valores[h->tamanho]->peso = DBL_MAX;
+
+		DiminuirChave(h, h->tamanho, peso);
+	}
+}
+
+//Inicializa A HEAP.
 Heap* ConstruirHeap(int n){
 	Heap* h = (Heap*)malloc(sizeof(Heap));
-	h->val = (double*)malloc(sizeof(double) * n);
+	h->valores = (No**)malloc(sizeof(No*) * n);
 	h->comprimento = n;
 	h->tamanho = -1;
 
 	for (int i = 0; i < n; i++){
-		h->val[i] = DBL_MAX;
+		h->valores[i] = NULL;
 	}
 
 	return h;
 }
 
+//Verifica se a HEAP está vazia.
 int HeapVazia(Heap* h){
 	if (h->tamanho == -1){
 		return 1;
 	}
 
 	return 0;
+}
+
+No* AlocaNo(int v, double p){
+      No* n = (No*) malloc(sizeof(No));
+
+      n->valor = v;
+      n->prox = NULL;
+      n->peso = p;
+
+      return n;
 }
