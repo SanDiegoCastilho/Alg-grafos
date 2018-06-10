@@ -26,7 +26,8 @@ int FEsquerdo(int i);
 int FDireito(int i);
 
 //Extrai o peso mínimo armazenado na HEAP.
-double ExtrairMin(Heap* h);
+
+No* ExtrairMin(Heap* h);
 
 //Função responsável por manter a propriedade de HEAP.
 void Descer(Heap* v, int i);
@@ -46,6 +47,8 @@ Heap* ConstruirHeap(int n);
 //Verifica se a HEAP está vazia.
 int HeapVazia(Heap* h);
 
+int ChecaExistencia(Heap* h, int valor);
+
 
 
 No* AlocaNo(int v, double p);
@@ -61,42 +64,25 @@ int main(){
     	InserirChave(h, AlocaNo((v2 - 1), p));
 	}
 
+	if (ChecaExistencia(h,2)){
+		printf("Existe!! H[%d] => %d\n",ChecaExistencia(h,2) - 1, h->valores[ChecaExistencia(h,2) - 1]->valor);
+	}
 
 	for (int i = 0; i <= h->tamanho; i++){
 		printf("H[%d] = > peso: %lg No: %d\n",i, h->valores[i]->peso, h->valores[i]->valor);
 	}
 
-	double min = 0;
+	No* min = (No*)malloc(sizeof(No));
 
 	for (int i = 0; i < 5; i++){
 		min = ExtrairMin(h);
 
-		printf("min: %lg\n", min);
+		printf("min: %lg\n", min->peso);
 
 		for (int i = 0; i <= h->tamanho; i++){
 			printf("H[%d] = > peso: %lg No: %d\n",i, h->valores[i]->peso, h->valores[i]->valor);
 		}
 	}
-
-	// InserirChave(h, 300.45);
-	// InserirChave(h, 290.15);
-	// InserirChave(h, 30.95);
-	// InserirChave(h, 3083.95);
-	// InserirChave(h, 20.95);
-	// InserirChave(h, 2150.95);
-
-	// printf("\n");
-	// for (int i = 0; i < h->comprimento; i++){
-	// 	printf("valor : %g\n", h->val[i]);
-	// }
-
-	// printf("\n");
-	// printf("valor minimo: %g\n", ExtrairMin(h));
-
-	// printf("\n");
-	// for (int i = 0; i <= h->tamanho; i++){
-	// 	printf("valor: %g\n", h->val[i]);
-	// }
 
 	return 0;
 }
@@ -118,10 +104,12 @@ int FDireito(int i){
 	return (2 * i) + 2;
 }
 
-//Extrai o peso mínimo armazenado na HEAP.
-double ExtrairMin(Heap* h){
+// Extrai o peso mínimo armazenado na HEA
+No* ExtrairMin(Heap* h){
 	if (h != NULL && h->tamanho >= 0){
-		double min = h->valores[0]->peso;
+		No* min = (No*)malloc(sizeof(No));
+		min = h->valores[0];
+
 		h->valores[0] = h->valores[h->tamanho];
 		h->tamanho = (h->tamanho - 1); 
 		Descer(h, 0);
@@ -232,4 +220,17 @@ No* AlocaNo(int v, double p){
       n->peso = p;
 
       return n;
+}
+
+//Checa se um determinado vértice pertence à HEAP, retornando o indice correspondente a sua posição nela.
+int ChecaExistencia(Heap* h, int valor){
+	if (h != NULL){
+		for (int i = 0; i < h->tamanho; i++){
+			if (h->valores[i]->valor == valor){
+				return (i + 1);
+			}
+		}
+
+		return 0;
+	}
 }

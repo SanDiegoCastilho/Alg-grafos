@@ -1,17 +1,17 @@
 #include <stdio.h>
+#include <float.h>
 #include <stdlib.h>
-
 
 typedef struct no{
       struct no* prox;
-      int valor;
       double peso;
+      int valor;
 } No;
 
 typedef struct heap{
-      No** val;
+      No** valores;
       int comprimento;
-      int Htamanho;
+      int tamanho;
 } Heap;
 
 typedef struct grafo{
@@ -28,31 +28,45 @@ GrafoLA* AlocaGrafoLA(int t);
 void IncluirNo(GrafoLA* g, No* no, int indice);
 
 //Assinaturas das funções da HEAP.
-Heap* ConstruirHeap(int n);
-
-void InserirChave(Heap* h, No* v);
-
-void DiminuirChave(Heap *h, int i, No* v);
-
-void Trocar(Heap* h, int i, int j);
-
-No* ExtrairMin(Heap* h);
-
-void AmontoarMin(Heap* v, int i);
-
-int Pertinencia(Heap *h, No* u);
-
+//Retorna a posição do Pai de um dado elemento.
 int Pai(int i);
 
+//Retorna a posição do Filho esquerdo de um dado elemento. 
 int FEsquerdo(int i);
 
+//Retorna a posição do Filho direito de um dado elemento.
 int FDireito(int i);
 
+//Extrai o peso mínimo armazenado na HEAP.
+No* ExtrairMin(Heap* h);
+
+//Função responsável por manter a propriedade de HEAP.
+void Descer(Heap* v, int i);
+
+//Função auxiliar responsável por trocar dois Nós na HEAP.
+void Trocar(Heap* h, int i, int j);
+
+//Função responsável por Diminuir a Chave de um determinado Nó na HEAP.
+void DiminuirChave(Heap *h, int i, double chave);
+
+//Insere um Nó na HEAP.
+void InserirChave(Heap* h, No* u);
+
+//Inicializa A HEAP.
+Heap* ConstruirHeap(int n);
+
+//Verifica se a HEAP está vazia.
 int HeapVazia(Heap* h);
 
-int ChecaExistencia(Heap *h, int indice);
+/*Checa se um determinado vértice pertence à HEAP, 
+retornando o indice correspondente a sua posição nela.*/
+int ChecaExistencia(Heap* h, int valor);
 
-void MostrarHeap(Heap *h);
+
+
+// int Pertinencia(Heap *h, No* u);
+
+// void MostrarHeap(Heap *h);
 
 
 
@@ -94,11 +108,12 @@ int main(){
       //       n_argumentos = scanf("%d %d %lg", &v1, &v2, &p);
       //       if (n_argumentos == 3 && 0 < v1 <= n && 0 < v2 <= n && v1 != v2) {
 
-            for (int i = 0; i < 5; i++){
-                  scanf("%d %d %lg", &v1, &v2, &p);
-                  IncluirNo(g, AlocaNo((v2-1), p), (v1-1));
-                  IncluirNo(g, AlocaNo((v1-1), p), (v2-1));
-            }
+      for (int i = 0; i < 24; i++){
+            // printf("valor(i) : %d\n", i);
+            scanf("%d %d %lg", &v1, &v2, &p);
+            IncluirNo(g, AlocaNo((v2-1), p), (v1-1));
+            IncluirNo(g, AlocaNo((v1-1), p), (v2-1));
+      }
 
       //       } else
       //             n_argumentos = 0;
@@ -118,40 +133,43 @@ int main(){
       atingido[0] = 1;
 
       while(u != NULL){
+            // printf("loop 1\n");
             atingido[u->valor] = 1;
             InserirChave(h, u);
             pai[u->valor] = 0;
             u = u->prox;
       }
 
-      MostrarHeap(h);
 
       // printf("passo 2\n");
       while(!HeapVazia(h)){
+            // printf("loop 2\n");
+            printf("tamanho(h): %d\n", h->tamanho);
             No* w = (No*)malloc(sizeof(No));
+            No* z = (No*)malloc(sizeof(No));
+
             w = ExtrairMin(h);
 
-            if (w != NULL){
-                  soma += w->peso;
-            }
+            soma += w->peso;
 
-            No* z = (No*)malloc(sizeof(No));
-            if (ChecaExistencia(h, w->valor)){
-                  z = g->LA[w->valor];
-            }
+            z = g->LA[w->valor];
+            
 
             while(z != NULL){
+                  // printf("loop 3\n");
                   if (!atingido[z->valor]){
                         atingido[z->valor] = 1;
                         pai[z->valor] = w->valor;
 
                   }else{
-                        int t = Pertinencia(h, z);
-                        if(t){
-                              DiminuirChave(h, t, z);
-                              pai[z->valor] = w->valor; 
+                        if(ChecaExistencia(h, z->valor) && z->peso < h->valores[ChecaExistencia(h, z->valor) - 1]->peso){
+                              DiminuirChave(h, ChecaExistencia(h, z->valor) - 1, z->peso);
+                              pai[z->valor] = w->valor;
+                              // printf("ok\n");
                         }
                   }
+
+                  z = z->prox;
             }
       }
 
@@ -160,134 +178,148 @@ int main(){
       return 0;
 }
 
+//Inicializa A HEAP.
 Heap* ConstruirHeap(int n){
       Heap* h = (Heap*)malloc(sizeof(Heap));
-      h->val = (No**)malloc(sizeof(No*) * n);
+      h->valores = (No**)malloc(sizeof(No*) * n);
       h->comprimento = n;
-      h->Htamanho = -1;
-
-      // printf("Construir Heap\n");
+      h->tamanho = -1;
 
       for (int i = 0; i < n; i++){
-            h->val[i] = NULL;
+            h->valores[i] = NULL;
       }
 
       return h;
 }
 
-/*Na posição Htamanho da HEAP estava colocando NULL, PQ? Talvez seja o principal motivo de erros.*/
-void InserirChave(Heap* h, No* v){
-      if (h != NULL && v != NULL){
-
-            // printf("Inserir Chave\n");
-            // printf("Tamanho: %d\n", h->Htamanho);
-
-            h->Htamanho = (h->Htamanho + 1);
-            h->val[h->Htamanho] = v;
-            DiminuirChave(h, h->Htamanho, v);
-      }
-}
-
-void DiminuirChave(Heap *h, int i, No* v){
-      if (h != NULL && v != NULL){
-            if (ChecaExistencia(h,i)){
-
-                  // printf("Diminuir Chave\n");
-
-                  h->val[i]->peso = v->peso;
-                  while(i >= 1 && h->val[Pai(i)]->peso > h->val[i]->peso){
-                        Trocar(h, i, Pai(i));
-                        i = Pai(i);
-                  }
-            }
-      }
-}
-
-void Trocar(Heap* h, int i, int j){
-      No* aux = (No*)malloc(sizeof(No));
-      if (ChecaExistencia(h,i)){
-            aux = h->val[i];
-            h->val[i] = h->val[j];
-            h->val[j] = aux;
-      }
-}
-
-No* ExtrairMin(Heap* h){
-      if (h != NULL){
-            if (ChecaExistencia(h,0)){
-                  No* min = (No*)malloc(sizeof(No));
-                  min = h->val[0];
-                  h->val[0] = h->val[h->Htamanho];
-                  h->Htamanho = (h->Htamanho - 1); 
-                  AmontoarMin(h, 0);
-
-                  return min;
-            }
-      }
-}
-
-void AmontoarMin(Heap* h, int i){
-      int e = FEsquerdo(i);
-      int d = FDireito(i);
-      int menor = 0;
-
-      if (h != NULL){
-            if (ChecaExistencia(h,e) && ChecaExistencia(h,d) && ChecaExistencia(h,i)){
-                  
-                  if ((e <= h->Htamanho) && (h->val[e]->peso < h->val[i]->peso)){
-                        menor = e;
-
-                  }else{
-                        menor = i;
-
-                  }
-
-                  if ((d <= h->Htamanho) && (h->val[d]->peso < h->val[i]->peso)){
-                        menor = d;
-                  }
-
-                  if (menor != i){
-                        Trocar(h, i, menor);
-                        AmontoarMin(h, menor);
-                  }
-            }
-      }
-
-}
-
-int Pertinencia(Heap *h, No* u){
-      if (h != NULL && u != NULL ){
-            for (int i = 0; i <= h->Htamanho; i++){
-                  if(h->val[i]->valor == u->valor){
-                        if (h->val[i]->peso > u->peso){
-                              return i;
-                        }
-
-                  }else{
-                        return 0;
-                  }
-            }
-      }
-}
-
-int Pai(int i){
-      return (i >> 1);
-}
-
-int FEsquerdo(int i){
-      return (2 * i);
-}
-
-int FDireito(int i){
-      return (2 * i) + 1;
-}
-
+//Verifica se a HEAP está vazia.
 int HeapVazia(Heap* h){
-      if (h->Htamanho == -1){
+      if (h->tamanho == -1){
             return 1;
       }
 
       return 0;
+}
+
+//Insere um Nó na HEAP.
+void InserirChave(Heap* h, No* u){
+      if (h != NULL && u != NULL){
+            double peso = u->peso;
+            h->tamanho = (h->tamanho + 1);
+            h->valores[h->tamanho] = u;
+            h->valores[h->tamanho]->peso = DBL_MAX;
+
+            DiminuirChave(h, h->tamanho, peso);
+      }
+}
+
+//Função responsável por Diminuir a Chave de um determinado Nó na HEAP.
+void DiminuirChave(Heap *h, int i, double chave){
+      if (h != NULL && chave < h->valores[i]->peso){
+            h->valores[i]->peso = chave;
+
+            while(i > 0 && h->valores[Pai(i)]->peso > h->valores[i]->peso){
+                  Trocar(h, i, Pai(i));
+                  i = Pai(i);
+            }
+      }
+}
+
+//Função auxiliar responsável por trocar dois Nós na HEAP.
+void Trocar(Heap* h, int i, int j){
+      if (h != NULL){
+            No* aux = (No*)malloc(sizeof(No));
+
+            aux = h->valores[j];
+            h->valores[j] = h->valores[i];
+            h->valores[i] = aux;
+
+      }
+}
+
+// Extrai o peso mínimo armazenado na HEA
+No* ExtrairMin(Heap* h){
+      if (h != NULL && h->tamanho >= 0){
+            No* min = (No*)malloc(sizeof(No));
+            min = h->valores[0];
+
+            h->valores[0] = h->valores[h->tamanho];
+            h->tamanho = (h->tamanho - 1); 
+            Descer(h, 0);
+
+            return min;
+      }
+
+      return 0;
+}
+
+//Função responsável por manter a propriedade de HEAP.
+void Descer(Heap* h, int i){
+      if (h != NULL && i >= 0 && i <= h->tamanho){
+            int e = FEsquerdo(i);
+            int d = FDireito(i);
+            int menor = 0;
+
+            if ((e <= h->tamanho) && (h->valores[e]->peso < h->valores[i]->peso))
+                  menor = e;
+            else
+                  menor = i;
+            
+
+            if ((d <= h->tamanho) && (h->valores[d]->peso < h->valores[menor]->peso))
+                  menor = d;
+            
+
+            if (menor != i){
+                  Trocar(h, i, menor);
+                  Descer(h, menor);
+            }
+      }
+}
+
+// int Pertinencia(Heap *h, No* u){
+//       if (h != NULL && u != NULL ){
+//             for (int i = 0; i <= h->Htamanho; i++){
+//                   if(h->val[i]->valor == u->valor){
+//                         if (h->val[i]->peso > u->peso){
+//                               return i;
+//                         }
+
+//                   }else{
+//                         return 0;
+//                   }
+//             }
+//       }
+// }
+
+//Definição das funções de manipulação de HEAP.
+int Pai(int i){
+      if (i != 0 && i % 2 == 0)
+            return (i >> 1) - 1;
+
+      return (i >> 1);
+}
+
+int FEsquerdo(int i){
+      return (2 * i) + 1;
+}
+
+int FDireito(int i){
+      return (2 * i) + 2;
+}
+
+/*Checa se um determinado vértice pertence à HEAP,
+  retornando o indice correspondente a sua posição nela.*/
+int ChecaExistencia(Heap* h, int valor){
+      if (h != NULL){
+            for (int i = 0; i < h->tamanho; i++){
+                  if (h->valores[i]->valor == valor){
+                        return (i + 1);
+                  }
+            }
+
+            return 0;
+      }
 }
 
 //Descrição das funçῶoes do Grafo;
@@ -326,19 +358,11 @@ void IncluirNo(GrafoLA* g, No* no, int indice){
       }
 }
 
-int ChecaExistencia(Heap *h, int indice){
-      // printf("Checa Existencia\n");
-      if (h->val[indice] != NULL){
-           return 1;
-      }
 
-      return 0;
-}
-
-void MostrarHeap(Heap *h){
-      for (int i = 0; i < h->Htamanho; i++){
-            if (h->val[i] != NULL){
-                  printf("%lg, %d\n ", h->val[i]->peso, i);
-            }
-      }
-}
+// void MostrarHeap(Heap *h){
+//       for (int i = 0; i < h->Htamanho; i++){
+//             if (h->val[i] != NULL){
+//                   printf("%lg, %d\n ", h->val[i]->peso, i);
+//             }
+//       }
+// }
