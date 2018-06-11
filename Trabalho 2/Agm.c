@@ -74,51 +74,49 @@ int main(){
       int n = 0, v1 = 0, v2 = 0;
       double p = 0, soma = 0;
 
-      // char c;
-      // int entrada = 0;
+      char c;
+      int entrada = 0;
 
-      // //parte de receber o código.
-      // char leitura[40];
-      // int cont = 0;
-      // do {
-      //       scanf("%s", &leitura);
-      //       printf("passo 0\n");
-      //       cont ++;
-      // } while (cont != 3);
+      //parte de receber o código.
+      char leitura[40];
+      int cont = 0;
+      do {
+            scanf("%s", &leitura);
+            cont ++;
+      } while (cont != 3);
 
-      // int convert = 1;
-      // int lei;
-      // for (int i = 2; leitura[i] != '\0'; i++) {
-      //       n *= convert;
-      //       lei = leitura[i]-48;
-      //       n += lei;
-      //       convert = 10;
-      // }
-      scanf("%d", &n);
-      // printf("passo 1\n");
+      int convert = 1;
+      int lei;
+      for (int i = 2; leitura[i] != '\0'; i++) {
+            n *= convert;
+            lei = leitura[i]-48;
+            n += lei;
+            convert = 10;
+      }
+
+      // scanf("%d", &n);
       int* pai = (int*)malloc(sizeof(int) * n);
       int* atingido = (int*)malloc(sizeof(int) * n);
       GrafoLA* g = AlocaGrafoLA(n);
       Heap *h = ConstruirHeap(n);
 
-      // char lixo;
-      // int n_argumentos;
-      // scanf("%s", &lixo);
-      // do {
-      //       n_argumentos = scanf("%d %d %lg", &v1, &v2, &p);
-      //       if (n_argumentos == 3 && 0 < v1 <= n && 0 < v2 <= n && v1 != v2) {
+      char lixo;
+      int n_argumentos;
+      scanf("%s", &lixo);
+      do {
+            n_argumentos = scanf("%d %d %lg", &v1, &v2, &p);
+            if (n_argumentos == 3 && 0 < v1 <= n && 0 < v2 <= n && v1 != v2) {
 
-      for (int i = 0; i < 24; i++){
-            // printf("valor(i) : %d\n", i);
-            scanf("%d %d %lg", &v1, &v2, &p);
+      // for (int i = 0; i < 24; i++){
+      //       scanf("%d %d %lg", &v1, &v2, &p);
             IncluirNo(g, AlocaNo((v2-1), p), (v1-1));
             IncluirNo(g, AlocaNo((v1-1), p), (v2-1));
-      }
+      // }
 
-      //       } else
-      //             n_argumentos = 0;
+            } else
+                  n_argumentos = 0;
 
-      // } while (n_argumentos == 3);
+      } while (n_argumentos == 3);
 
 
       for (int i = 0; i < n; i++){
@@ -127,13 +125,11 @@ int main(){
       }
 
      
-
-      /*Rever esse algoritmo*/
+      /*Algoritmo de PRIM*/
       No* u = g->LA[0];
       atingido[0] = 1;
 
       while(u != NULL){
-            // printf("loop 1\n");
             atingido[u->valor] = 1;
             InserirChave(h, u);
             pai[u->valor] = 0;
@@ -141,9 +137,7 @@ int main(){
       }
 
 
-      // printf("passo 2\n");
       while(!HeapVazia(h)){
-            // printf("loop 2\n");
             printf("tamanho(h): %d\n", h->tamanho);
             No* w = (No*)malloc(sizeof(No));
             No* z = (No*)malloc(sizeof(No));
@@ -159,13 +153,13 @@ int main(){
                   // printf("loop 3\n");
                   if (!atingido[z->valor]){
                         atingido[z->valor] = 1;
+                        InserirChave(h, z);
                         pai[z->valor] = w->valor;
 
                   }else{
                         if(ChecaExistencia(h, z->valor) && z->peso < h->valores[ChecaExistencia(h, z->valor) - 1]->peso){
                               DiminuirChave(h, ChecaExistencia(h, z->valor) - 1, z->peso);
                               pai[z->valor] = w->valor;
-                              // printf("ok\n");
                         }
                   }
 
@@ -277,21 +271,6 @@ void Descer(Heap* h, int i){
       }
 }
 
-// int Pertinencia(Heap *h, No* u){
-//       if (h != NULL && u != NULL ){
-//             for (int i = 0; i <= h->Htamanho; i++){
-//                   if(h->val[i]->valor == u->valor){
-//                         if (h->val[i]->peso > u->peso){
-//                               return i;
-//                         }
-
-//                   }else{
-//                         return 0;
-//                   }
-//             }
-//       }
-// }
-
 //Definição das funções de manipulação de HEAP.
 int Pai(int i){
       if (i != 0 && i % 2 == 0)
@@ -357,12 +336,3 @@ void IncluirNo(GrafoLA* g, No* no, int indice){
             }
       }
 }
-
-
-// void MostrarHeap(Heap *h){
-//       for (int i = 0; i < h->Htamanho; i++){
-//             if (h->val[i] != NULL){
-//                   printf("%lg, %d\n ", h->val[i]->peso, i);
-//             }
-//       }
-// }
