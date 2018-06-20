@@ -62,14 +62,6 @@ int HeapVazia(Heap* h);
 retornando o indice correspondente a sua posição nela.*/
 int ChecaExistencia(Heap* h, int valor);
 
-
-
-// int Pertinencia(Heap *h, No* u);
-
-// void MostrarHeap(Heap *h);
-
-
-
 int main(){
       int n = 0, v1 = 0, v2 = 0;
       double p = 0, soma = 0;
@@ -81,7 +73,7 @@ int main(){
       char leitura[40];
       int cont = 0;
       do {
-            scanf("%s", &leitura);
+            scanf("%s", leitura);
             cont ++;
       } while (cont != 3);
 
@@ -94,7 +86,6 @@ int main(){
             convert = 10;
       }
 
-      // scanf("%d", &n);
       int* pai = (int*)malloc(sizeof(int) * n);
       int* atingido = (int*)malloc(sizeof(int) * n);
       GrafoLA* g = AlocaGrafoLA(n);
@@ -107,11 +98,10 @@ int main(){
             n_argumentos = scanf("%d %d %lg", &v1, &v2, &p);
             if (n_argumentos == 3 && 0 < v1 <= n && 0 < v2 <= n && v1 != v2) {
 
-      // for (int i = 0; i < 24; i++){
-      //       scanf("%d %d %lg", &v1, &v2, &p);
+
             IncluirNo(g, AlocaNo((v2-1), p), (v1-1));
             IncluirNo(g, AlocaNo((v1-1), p), (v2-1));
-      // }
+      
 
             } else
                   n_argumentos = 0;
@@ -136,27 +126,26 @@ int main(){
             u = u->prox;
       }
 
+      No* w = (No*)malloc(sizeof(No));
+      No* z = (No*)malloc(sizeof(No));
 
       while(!HeapVazia(h)){
-            printf("tamanho(h): %d\n", h->tamanho);
-            No* w = (No*)malloc(sizeof(No));
-            No* z = (No*)malloc(sizeof(No));
 
             w = ExtrairMin(h);
-
+            
             soma += w->peso;
 
             z = g->LA[w->valor];
             
 
             while(z != NULL){
-                  // printf("loop 3\n");
                   if (!atingido[z->valor]){
                         atingido[z->valor] = 1;
                         InserirChave(h, z);
                         pai[z->valor] = w->valor;
 
                   }else{
+
                         if(ChecaExistencia(h, z->valor) && z->peso < h->valores[ChecaExistencia(h, z->valor) - 1]->peso){
                               DiminuirChave(h, ChecaExistencia(h, z->valor) - 1, z->peso);
                               pai[z->valor] = w->valor;
@@ -164,10 +153,11 @@ int main(){
                   }
 
                   z = z->prox;
+
             }
       }
 
-      printf("%g", soma);
+      printf("%.3lf", soma);
 
       return 0;
 }
@@ -291,7 +281,7 @@ int FDireito(int i){
   retornando o indice correspondente a sua posição nela.*/
 int ChecaExistencia(Heap* h, int valor){
       if (h != NULL){
-            for (int i = 0; i < h->tamanho; i++){
+            for (int i = 0; i <= h->tamanho; i++){
                   if (h->valores[i]->valor == valor){
                         return (i + 1);
                   }
