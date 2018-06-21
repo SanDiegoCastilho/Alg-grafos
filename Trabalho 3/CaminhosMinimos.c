@@ -64,16 +64,49 @@ int ChecaExistencia(Heap* h, int valor);
 
 
 int main(){
-	int n = 0, v1 = 0, v2 = 0;
+    int n = 0, v1 = 0, v2 = 0;
     double p = 0;
 
-    // scanf("%d", &n);
+      char c;
+      int entrada = 0;
 
-    int* pai = (int*)malloc(sizeof(int) * n);
-    int* atingido = (int*)malloc(sizeof(int) * n);
-    double* dist  = (double*)malloc(sizeof(double) * n); 
-    GrafoLA* g = AlocaGrafoLA(n);
-    Heap *h = ConstruirHeap(n);
+      //parte de receber o código.
+      char leitura[40];
+      int cont = 0;
+      do {
+            scanf("%s", leitura);
+            cont ++;
+      } while (cont != 3);
+
+      int convert = 1;
+      int lei;
+      for (int i = 2; leitura[i] != '\0'; i++) {
+            n *= convert;
+            lei = leitura[i]-48;
+            n += lei;
+            convert = 10;
+      }
+
+      int* pai = (int*)malloc(sizeof(int) * n);
+      int* atingido = (int*)malloc(sizeof(int) * n);
+      double* dist  = (double*)malloc(sizeof(double) * n);
+      GrafoLA* g = AlocaGrafoLA(n);
+      Heap *h = ConstruirHeap(n);
+
+      char lixo;
+      int n_argumentos;
+      scanf("%s", &lixo);
+      do {
+            n_argumentos = scanf("%d %d %lg", &v1, &v2, &p);
+            if (n_argumentos == 3 && 0 < v1 <= n && 0 < v2 <= n && v1 != v2) {
+
+
+            IncluirNo(g, AlocaNo((v2-1), p), (v1-1));
+
+            } else
+                  n_argumentos = 0;
+
+      } while (n_argumentos == 3);
 
 
     //Algoritmo de DIJKSTRA.
@@ -99,7 +132,7 @@ int main(){
     No* z = (No*)malloc(sizeof(No));
 
     while(!HeapVazia(h)){
-    	w = ExtrairMin(h);
+      w = ExtrairMin(h);
     	dist[w->valor] = w->peso;
 
     	z = g->LA[w->valor];
@@ -108,12 +141,28 @@ int main(){
     		if (!atingido[z->valor]){
     			atingido[z->valor] = 1;
     			pai[z->valor] = w->valor;
-    			InserirChave(h, z, z->peso);
+    			InserirChave(h, z, z->peso + dist[w->valor]);
     		}else{
-
+                  if(ChecaExistencia(h, z->valor) && (z->peso + dist[w->valor]) < h->valores[ChecaExistencia(h, z->valor) - 1]->peso){
+                        DiminuirChave(h, ChecaExistencia(h, z->valor) - 1, z->peso + dist[w->valor]);
+                        pai[z->valor] = w->valor;
+                  }
     		}
-    	}
 
+            z = z->prox;
+    	}
+    }
+
+    for(int i = 0; i < n; i++){
+          if(dist[i] == DBL_MAX){
+                printf("%d INFINITO", (i+1));
+          }else{
+                printf("%d %.3lf", (i+1), dist[i]);
+          }
+
+          if(i != n-1){
+                printf("\n");
+          }
     }
 
 
